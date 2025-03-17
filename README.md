@@ -1,36 +1,29 @@
 # Talk to Documents with LangChain and Python
 
-A powerful document chat application that allows you to have natural conversations with your documents using RAG (Retrieval Augmented Generation) and LangChain. Provides a REST API built with Flask.
-
-## Features
-
-- 📄 Support for PDF and TXT documents
-- 💬 Natural conversation with documents
-- 🧠 Smart context retrieval using vector similarity
-- 🔄 Maintains conversation history
-- 🤖 Works with or without document context
-- 📎 Multiple document support
-- 🌐 REST API interface
+A powerful REST API chat application that allows you to have natural conversations with your documents using RAG (Retrieval Augmented Generation) and LangChain.
 
 ## How it Works
 
 The application uses three main components:
 
 1. **DocumentProcessor**: Handles document ingestion and processing
-   - Loads PDF and TXT files
-   - Splits documents into manageable chunks
-   - Creates vector embeddings using OpenAI
-   - Stores embeddings in a FAISS vector store
+   - Loads PDF, TXT, and other unstructured files using appropriate loaders
+   - Splits documents into chunks with configurable size and overlap
+   - Creates vector embeddings using OpenAI's embedding model
+   - Stores and manages embeddings in a FAISS vector store for efficient similarity search
 
 2. **ChatEngine**: Manages the conversation with the AI
-   - Retrieves relevant document context for each question
-   - Maintains conversation history
-   - Generates contextual responses using OpenAI
+   - Uses OpenAI's chat model for generating responses
+   - Maintains conversation history with system, human, and AI messages
+   - Formats messages with context when available
+   - Provides conversation reset functionality
 
-3. **ChatManager**: Orchestrates the entire process
-   - Manages document uploads
-   - Handles chat sessions
-   - Maintains conversation state
+3. **RAGChatbot**: Orchestrates the entire process
+   - Coordinates between DocumentProcessor and ChatEngine
+   - Handles document uploads and processing
+   - Manages chat sessions and message flow
+   - Provides independent control over chat and document states
+   - Implements the core RAG (Retrieval Augmented Generation) logic
 
 ## Requirements
 
@@ -60,7 +53,7 @@ The application uses three main components:
    cd app
    python main.py
    ```
-   The Flask server will start on port 3000 (http://localhost:3000)
+   The server will start on port 3000 (http://localhost:3000)
 
 ## API Endpoints
 
@@ -76,10 +69,8 @@ Upload a PDF or TXT file for processing.
 **Response**:
 ```json
 {
-    "message": "File 'document.pdf' uploaded and processed successfully.",
-    "result": {
-        "status": "Document processed successfully."
-    }
+    "status": "success",
+    "message": "Document processed successfully"
 }
 ```
 
@@ -101,37 +92,44 @@ Send a message to chat with the uploaded documents.
 }
 ```
 
-### Reset Session
+### Reset Chat
 ```http
-POST /reset
+POST /reset/chat
 ```
-Reset the chat session, clearing conversation history and loaded documents.
+Reset only the conversation history while keeping the document knowledge.
 
 **Response**:
 ```json
 {
-    "message": "Chat session has been reset.",
-    "result": {
-        "status": "Chat session has been reset."
-    }
+    "status": "success",
+    "message": "Conversation history has been reset."
 }
 ```
 
-## Error Responses
-The API may return the following error responses:
+### Reset Documents
+```http
+POST /reset/documents
+```
+Reset only the document knowledge while keeping the conversation history.
 
+**Response**:
 ```json
 {
-    "error": "No file part in request"
+    "status": "success",
+    "message": "Document knowledge has been reset."
 }
 ```
-```json
-{
-    "error": "No file selected"
-}
+
+### Reset All
+```http
+POST /reset/all
 ```
+Reset both conversation history and document knowledge.
+
+**Response**:
 ```json
 {
-    "error": "No message provided"
+    "status": "success",
+    "message": "Both conversation history and document knowledge have been reset."
 }
 ```
