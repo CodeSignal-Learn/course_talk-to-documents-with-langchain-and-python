@@ -8,8 +8,11 @@ class RAGChatbot:
         
     def upload_document(self, file_path):
         """Upload and process a document"""
-        chunks = self.document_processor.process_document(file_path)
-        return f"Processed {len(chunks)} chunks from {file_path}"
+        try:
+            self.document_processor.process_document(file_path)
+            return f"Successfully processed document: {file_path}"
+        except ValueError as e:
+            return f"Error: {str(e)}"
         
     def send_message(self, message):
         """Send a message to the chatbot and get a response"""

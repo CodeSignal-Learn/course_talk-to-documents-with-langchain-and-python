@@ -1,8 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 import os
 import tempfile
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from pydantic import BaseModel
+import uvicorn
 from rag_chatbot import RAGChatbot
 
 app = FastAPI(title="RAG Chatbot API")
@@ -74,5 +74,4 @@ async def reset_all():
         raise HTTPException(status_code=500, detail=f"Error resetting all: {str(e)}")
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

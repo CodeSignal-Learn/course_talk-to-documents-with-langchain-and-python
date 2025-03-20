@@ -4,10 +4,10 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 class DocumentProcessor:
-    def __init__(self, chunk_size=1000, chunk_overlap=100):
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-        self.embeddings = OpenAIEmbeddings()
+    def __init__(self):
+        self.chunk_size = 1000
+        self.chunk_overlap = 100
+        self.embedding_model = OpenAIEmbeddings()
         self.vectorstore = None
         
     def load_document(self, file_path):
@@ -17,7 +17,7 @@ class DocumentProcessor:
         elif file_path.endswith('.txt'):
             loader = TextLoader(file_path)
         else:
-            loader = UnstructuredFileLoader(file_path)
+            raise ValueError("Unsupported file format")
             
         return loader.load()
         
@@ -35,11 +35,9 @@ class DocumentProcessor:
         
         # Create or update the vector store
         if self.vectorstore is None:
-            self.vectorstore = FAISS.from_documents(split_docs, self.embeddings)
+            self.vectorstore = FAISS.from_documents(split_docs, self.embedding_model)
         else:
             self.vectorstore.add_documents(split_docs)
-            
-        return split_docs
         
     def retrieve_relevant_context(self, query, k=3):
         """Retrieve relevant document chunks for a query"""
